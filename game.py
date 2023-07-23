@@ -46,19 +46,20 @@ class TetrisGame:
         # initialize game state
         self.display.fill(BLACK)
         self.gameBoard = [[(len(SHAPE_COLORS) - 1) for _ in range(40)] for _ in range(10)]
-        self.pieces = deque()
-        self._add_pieces()
+        self.piece_bag = deque()
+        self._add_pieces_to_bag()
         self._add_new_falling_piece()
         self._draw_grid()
         self._draw_upcoming_pieces()
         self._draw_hold_piece()
 
+    # Add the new piece at game start and when another piece is placed
     def _add_new_falling_piece(self):
-        fallingPieceIdx = self.pieces.popleft()
+        fallingPieceIdx = self.piece_bag.popleft()
 
         # Make sure there are enough pieces to fill the upcoming piece area
-        if len(self.pieces) <= 6:
-            self._add_pieces()
+        if len(self.piece_bag) <= 6:
+            self._add_pieces_to_bag()
 
         # intialize the piece
         self.fallingPiece = Piece((COLUMNS - len(SHAPES[fallingPieceIdx][0])) // 2, -3, fallingPieceIdx)
@@ -66,11 +67,12 @@ class TetrisGame:
         # update the game board
         self._draw_falling_piece()
 
-    def _add_pieces(self):
+
+    def _add_pieces_to_bag(self):
         pieces = list(range(7))
         random.shuffle(pieces)
         for piece in pieces: 
-            self.pieces.append(piece)
+            self.piece_bag.append(piece)
 
     def _draw_grid(self):
         for x in range(COLUMNS):
