@@ -15,6 +15,7 @@ class Piece(object):
         self.col = col
         self.row = row
 
+        self.shapeIdx = shapeIdx
         self.shape = SHAPES[shapeIdx]
         self.color = SHAPE_COLORS[shapeIdx]
         self.rotation = 0 # This will be in [0, 3], for four different rotated shapes
@@ -181,7 +182,40 @@ class TetrisGame:
     def _rotate_clockwise(self):
         self.fallingPiece.rotate_clockwise()
         if not self._is_falling_piece_legal():
-            self.fallingPiece.rotate_counter_clockwise()
+            # There's a separate kick table for the I piece
+            if self.fallingPiece.shapeIdx == 0:
+                # Try four tests based on current rotation
+
+                match self.fallingPiece.rotation:
+                    # 0 -> R
+                    case 0:
+                        # This is the most scuffed shit I've ever written
+                        self.fallingPiece.col -= 2
+                        if not self._is_falling_piece_legal():
+                            self.fallingPiece.col += 3
+                            if not self._is_falling_piece_legal():
+                                self.fallingPiece.col -= 2
+                                self.fallingPiece.row += 1
+                                if not self._is_falling_piece_legal():
+                                    self.fallingPiece.col += 3
+                                    self.fallingPiece.row -= 3
+                                    if not self._is_falling_piece_legal():
+                                        self.fallingPiece.col -= 1
+                                        self.fallingPiece.row += 2
+                                        self.fallingPiece.rotate_counter_clockwise()
+                    # R -> 2
+                    case 1:
+                        ...
+                    # 2 -> L
+                    case 2:
+                        ...
+                    # L -> 0
+                    case 3:
+                        ...
+                    case _:
+                        raise ValueError("Why is rotation not good")
+            else:
+                pass
     
     def _rotate_counter_clockwise(self):
         self.fallingPiece.rotate_counter_clockwise()
