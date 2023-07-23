@@ -67,13 +67,15 @@ class TetrisGame:
         # update the game board
         self._draw_falling_piece()
 
-
+    # Add pieces to the piece bag
+    # We're using a 7 bag randomizer or w/e it's called
     def _add_pieces_to_bag(self):
         pieces = list(range(7))
         random.shuffle(pieces)
         for piece in pieces: 
             self.piece_bag.append(piece)
 
+    # Draws the playing grid and the placed pieces
     def _draw_grid(self):
         for x in range(COLUMNS):
             for y in range(VISIBLE_ROWS):
@@ -84,6 +86,7 @@ class TetrisGame:
 
         pygame.display.flip()
 
+    # Draws the box with the 5 upcoming pieces
     def _draw_upcoming_pieces(self):
         upcomingPiecesDisplayArea = pygame.Rect(
             UPCOMING_PIECES_SCREEN_LEFT_X_COORDINATE, 
@@ -95,6 +98,7 @@ class TetrisGame:
 
         pygame.display.flip()
 
+    # Draws the box with the hold piece
     def _draw_hold_piece(self):
         holdPieceDisplayArea = pygame.Rect(
             HOLD_PIECE_SCREEN_LEFT_X_COORDINATE,
@@ -107,6 +111,7 @@ class TetrisGame:
 
         pygame.display.flip()
 
+    # In charge of drawing the falling piece
     def _draw_falling_piece(self):
         for col in range(self.fallingPiece.width):
             for row in range(self.fallingPiece.height):
@@ -128,10 +133,9 @@ class TetrisGame:
 
         pygame.display.flip()
 
-    def _update_ui(self):
-        pass
-
+    # Makes a step in the game
     def play_step(self):
+        # List of keys that are pressed
         keys = pygame.key.get_pressed()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -147,10 +151,11 @@ class TetrisGame:
                         print("going right")
                         self.key_down_time = time.time()
                         self.shifted = False
-                    case pygame.K_UP:
-                        self._add_new_falling_piece()
                     case pygame.K_DOWN:
-                        pass
+                        self._add_new_falling_piece()
+                    case pygame.K_CAPSLOCK:
+                        print("Hold this piece")
+                    
                     case _:
                         continue
 
