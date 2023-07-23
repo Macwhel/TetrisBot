@@ -29,3 +29,40 @@ HOLD_PIECE_SCREEN_TOP_Y_COORDINATE = TOP_LEFT_Y_COORDINATE
 
 # Controls
 DAS_DELAY = 0.1
+
+# SRS Kick Table
+
+# I Table
+# Use https://tetris.wiki/File:TETR.IO_SRS%2Bkicks.png to update the table
+I_KICK_TABLE = [
+    [(-1, 0), (-1, 1), ( 0, -2), (-1, -2)], # L -> 0
+    [(-2, 0), (1, 0), (-2, 1), (1, -2)], # 0 -> R
+    [(1, 0), (1, 1), (0, -2), (1, -2)], # R -> 2 SAME AS R -> 0
+    [(1, 0), (1, -1), (0, 2), (1, 2)], # 2 -> L
+    [(1, 0), (1, 1), (0, -2), (1, -2)], # R -> 0 SAME AS R -> 2
+    [(-1, 0), (-1, -1), (0, 2), (-1, 2)], # 2 -> R
+    [(-1, 0), (-1, 1), (0, -2), (-1, -2)], # L -> 2
+    [(1, 0), (1, -1), (0, 2), (1, 2)], # 0 -> L
+    [], # 2 -> 0
+    [], # L -> R
+    [], # 0 -> 2
+    []  # R -> L
+]
+
+# TODO separate kick table for T pieces
+
+
+OTHER_KICK_TABLE = [
+    [], # L -> 0
+    [], # 0 -> R
+    [], # R -> 2
+    [], # 2 -> L
+    [], # R -> 0
+    [], # 2 -> R
+    [], # L -> 2
+    [], # 0 -> L
+    [], # 2 -> 0
+    [], # L -> R
+    [], # 0 -> 2
+    []  # R -> L
+]

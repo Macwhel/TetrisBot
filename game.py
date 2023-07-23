@@ -183,39 +183,33 @@ class TetrisGame:
         self.fallingPiece.rotate_clockwise()
         if not self._is_falling_piece_legal():
             # There's a separate kick table for the I piece
+            initialCol = self.fallingPiece.col
+            initialRow = self.fallingPiece.row
+            rotationIndex = self.fallingPiece.rotation
             if self.fallingPiece.shapeIdx == 0:
                 # Try four tests based on current rotation
-
-                match self.fallingPiece.rotation:
-                    # 0 -> R
-                    case 0:
-                        # This is the most scuffed shit I've ever written
-                        self.fallingPiece.col -= 2
-                        if not self._is_falling_piece_legal():
-                            self.fallingPiece.col += 3
-                            if not self._is_falling_piece_legal():
-                                self.fallingPiece.col -= 2
-                                self.fallingPiece.row += 1
-                                if not self._is_falling_piece_legal():
-                                    self.fallingPiece.col += 3
-                                    self.fallingPiece.row -= 3
-                                    if not self._is_falling_piece_legal():
-                                        self.fallingPiece.col -= 1
-                                        self.fallingPiece.row += 2
-                                        self.fallingPiece.rotate_counter_clockwise()
-                    # R -> 2
-                    case 1:
-                        ...
-                    # 2 -> L
-                    case 2:
-                        ...
-                    # L -> 0
-                    case 3:
-                        ...
-                    case _:
-                        raise ValueError("Why is rotation not good")
+                for i in range(len(I_KICK_TABLE[rotationIndex])):
+                    dx, dy = I_KICK_TABLE[rotationIndex][i]
+                    self.fallingPiece.col = initialCol + dx
+                    self.fallingPiece.row = initialRow + dy
+                    if self._is_falling_piece_legal():
+                        return
+                
+                self.fallingPiece.col = initialCol
+                self.fallingPiece.row = initialRow
             else:
-                pass
+                for i in range(len(OTHER_KICK_TABLE[rotationIndex])):
+                    dx, dy = OTHER_KICK_TABLE[rotationIndex][i]
+                    self.fallingPiece.col = initialCol + dx
+                    self.fallingPiece.row = initialRow + dy
+                    if self._is_falling_piece_legal():
+                        return
+                
+                self.fallingPiece.col = initialCol
+                self.fallingPiece.row = initialRow
+
+            self.fallingPiece.rotate_counter_clockwise()
+                
     
     def _rotate_counter_clockwise(self):
         self.fallingPiece.rotate_counter_clockwise()
