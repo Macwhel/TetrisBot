@@ -18,13 +18,24 @@ class Piece(object):
         self.shape = SHAPES[shapeIdx]
         self.color = SHAPE_COLORS[shapeIdx]
         self.rotation = 0 # This will be in [0, 3], for four different rotated shapes
-        self.rotatedPiece = self.shape[self.rotation]
+        self.update_rotated_piece()
         self.width = len(self.rotatedPiece[0])
         self.height = len(self.rotatedPiece)
 
+    def update_rotated_piece(self):
+        self.rotatedPiece = self.shape[self.rotation]
 
+    def rotate_clockwise(self):
+        self.rotation = (self.rotation + 1) % 4
+        self.update_rotated_piece()
 
+    def rotate_counter_clockwise(self):
+        self.rotation = (self.rotation + 3) % 4
+        self.update_rotated_piece()
 
+    def rotate_180(self):
+        self.rotation = (self.rotation + 2) % 4
+        self.update_rotated_piece()
 
 
 class TetrisGame:
@@ -94,6 +105,7 @@ class TetrisGame:
 
         pygame.display.flip()
 
+
     # Draws the box with the 5 upcoming pieces
     def _draw_upcoming_pieces(self):
         upcomingPiecesDisplayArea = pygame.Rect(
@@ -142,6 +154,17 @@ class TetrisGame:
         pygame.display.flip()
 
     def _is_falling_piece_legal(self):
+        for x in range(self.fallingPiece.width):
+            for y in range(self.fallingPiece.height):
+                if self.fallingPiece.rotatedPiece[y][x] == '0':
+                    xCoord = self.fallingPiece.col + x
+                    yCoord = self.fallingPiece.row + y + 20
+                    if (xCoord < 0 
+                        or xCoord >= COLUMNS
+                        or yCoord >= 40
+                        or self.gameBoard[xCoord][yCoord] != (len(SHAPE_COLORS) - 1)):
+                        return False
+
         return True
 
     def _move_falling_piece(self, dx, dy):
@@ -153,6 +176,22 @@ class TetrisGame:
             self.fallingPiece.row -= dy
             return False
         return True
+    
+    # Rotations. Implement kick tables in a bit.
+    def _rotate_clockwise(self):
+        self.fallingPiece.rotate_clockwise()
+        if not self._is_falling_piece_legal():
+            self.fallingPiece.rotate_counter_clockwise()
+    
+    def _rotate_counter_clockwise(self):
+        self.fallingPiece.rotate_counter_clockwise()
+        if not self._is_falling_piece_legal():
+            self.fallingPiece.rotate_clockwise()
+
+    def _rotate_180(self):
+        self.fallingPiece.rotate_180()
+        if not self._is_falling_piece_legal():
+            self.fallingPiece.rotate_180()
 
     # Makes a step in the game
     def play_step(self):
@@ -179,7 +218,15 @@ class TetrisGame:
                     case pygame.K_CAPSLOCK:
                         self._add_new_falling_piece()
                         print("Hold this piece")
-                    
+                    case pygame.K_q:
+                        self._rotate_counter_clockwise()
+                        print("Rotating CC-wise")
+                    case pygame.K_w:
+                        self._rotate_clockwise()
+                        print("Rotating C-wise")
+                    case pygame.K_e:
+                        self._rotate_180()
+                        print("Rotatin 180")
                     case _:
                         continue
 
