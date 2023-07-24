@@ -1,15 +1,23 @@
 import pygame
 import numpy as np
+from typing import List
 import time
 from Models.Shapes import SHAPES, SHAPE_COLORS
 from Models.Colors import BLACK, WHITE
 from config import *
 import random
 from collections import deque
+from enum import Enum
 
 pygame.init()
-# font = pygame.font.Font('arial.ttf', 25)
 
+
+class Rotations(Enum):
+    CLOCKWISE = 1
+    COUNTER_CLOCKWISE = 2
+    ONE_EIGHTY = 3
+
+# TODO: Have each piece have it's own enum value
 class Piece(object):
     def __init__(self, col: int, row: int, shapeIdx: int):
         self.col = col
@@ -178,47 +186,63 @@ class TetrisGame:
             return False
         return True
     
+    def _get_wallkick_table_row(self, rotation) -> List[tuple]:
+        rotationIndex = self.fallingPiece.rotation
+        match rotation:
+            case Rotations.CLOCKWISE:
+                # This could be modularized but seems a bit unnecessary rn
+                if self.fallingPiece.shapeIdx == 0:
+                    return I_PIECE_CLOCKWISE_KICK_TABLE[rotationIndex]
+                else:
+                    return OTHER_PIECES_CLOCKWISE_KICK_TABLE[rotationIndex]
+            case Rotations.COUNTER_CLOCKWISE:
+                if self.fallingPiece.shapeIdx == 0:
+                    return I_PIECE_COUNTER_CLOCKWISE_KICK_TABLE[rotationIndex]
+                else:
+                    return OTHER_PIECES_COUNTER_CLOCKWISE_KICK_TABLE[rotationIndex]
+            case Rotations.ONE_EIGHTY:
+                # There might be a separate one for I pieces idk
+                return TETRIO_180_KICK_TABLE[rotationIndex]
+            case _:
+                return [] # There's a problem
+
+                
+    def _handle_wall_kicks(self, rotation):
+        tableRow = self._get_wallkick_table_row(rotation)
+        initialCol = self.fallingPiece.col
+        initialRow = self.fallingPiece.row
+        for i in range(len(tableRow)):
+            dx, dy = tableRow[i]
+            self.fallingPiece.col = initialCol + dx
+            self.fallingPiece.row = initialRow + dy
+            if self._is_falling_piece_legal():
+                return True
+        self.fallingPiece.col = initialCol
+        self.fallingPiece.row = initialRow
+
+        return False
+    
     # Rotations. Implement kick tables in a bit.
     def _rotate_clockwise(self):
         self.fallingPiece.rotate_clockwise()
         if not self._is_falling_piece_legal():
             # There's a separate kick table for the I piece
-            initialCol = self.fallingPiece.col
-            initialRow = self.fallingPiece.row
-            rotationIndex = self.fallingPiece.rotation
-            if self.fallingPiece.shapeIdx == 0:
-                # Try four tests based on current rotation
-                for i in range(len(I_KICK_TABLE[rotationIndex])):
-                    dx, dy = I_KICK_TABLE[rotationIndex][i]
-                    self.fallingPiece.col = initialCol + dx
-                    self.fallingPiece.row = initialRow + dy
-                    if self._is_falling_piece_legal():
-                        return
-                
-                self.fallingPiece.col = initialCol
-                self.fallingPiece.row = initialRow
-            else:
-                for i in range(len(OTHER_KICK_TABLE[rotationIndex])):
-                    dx, dy = OTHER_KICK_TABLE[rotationIndex][i]
-                    self.fallingPiece.col = initialCol + dx
-                    self.fallingPiece.row = initialRow + dy
-                    if self._is_falling_piece_legal():
-                        return
-                
-                self.fallingPiece.col = initialCol
-                self.fallingPiece.row = initialRow
-
+            if self._handle_wall_kicks(Rotations.CLOCKWISE):
+                return
             self.fallingPiece.rotate_counter_clockwise()
-                
     
     def _rotate_counter_clockwise(self):
         self.fallingPiece.rotate_counter_clockwise()
         if not self._is_falling_piece_legal():
+            if self._handle_wall_kicks(Rotations.COUNTER_CLOCKWISE):
+                return
             self.fallingPiece.rotate_clockwise()
 
     def _rotate_180(self):
         self.fallingPiece.rotate_180()
         if not self._is_falling_piece_legal():
+            if self._handle_wall_kicks(Rotations.ONE_EIGHTY):
+                return
             self.fallingPiece.rotate_180()
 
     # Makes a step in the game
@@ -243,6 +267,7 @@ class TetrisGame:
                         self.shifted = False
                     case pygame.K_DOWN:
                         self._move_falling_piece(0, 1)
+                        # We have a bug here. Check later
                     case pygame.K_CAPSLOCK:
                         self._add_new_falling_piece()
                         print("Hold this piece")
