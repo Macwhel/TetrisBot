@@ -1,5 +1,4 @@
 import pygame
-import numpy as np
 from typing import List
 import time
 from Models.Piece import Piece
@@ -9,7 +8,7 @@ from Models.Colors import BLACK, WHITE
 from config import *
 import random
 from collections import deque
-from enum import Enum
+import pprint as pp
 
 pygame.init()
 
@@ -29,7 +28,9 @@ class TetrisGame:
     def reset(self):
         # initialize game state
         self.display.fill(BLACK)
-        self.gameBoard = [[(len(SHAPE_COLORS) - 1) for _ in range(40)] for _ in range(10)]
+        self.gameBoard = [[(len(SHAPE_COLORS) - 1) for _ in range(10)] for _ in range(40)]
+
+        # Reset piece bag
         self.piece_bag = deque()
         self._add_pieces_to_bag()
         self._add_new_falling_piece()
@@ -76,7 +77,7 @@ class TetrisGame:
                 shiftedX = (x * BLOCK_SIZE) + TOP_LEFT_X_COORDINATE
                 shiftedY = (y * BLOCK_SIZE) + TOP_LEFT_Y_COORDINATE
                 boardSquare = pygame.Rect(shiftedX, shiftedY, BLOCK_SIZE, BLOCK_SIZE)
-                pygame.draw.rect(self.display, SHAPE_COLORS[self.gameBoard[x][HIDDEN_ROWS + y]], boardSquare)
+                pygame.draw.rect(self.display, SHAPE_COLORS[self.gameBoard[HIDDEN_ROWS + y][x]], boardSquare)
 
         pygame.display.flip()
 
@@ -136,7 +137,7 @@ class TetrisGame:
                     if (xCoord < 0 
                         or xCoord >= COLUMNS
                         or yCoord >= 40
-                        or self.gameBoard[xCoord][yCoord] != (len(SHAPE_COLORS) - 1)):
+                        or self.gameBoard[yCoord][xCoord] != (len(SHAPE_COLORS) - 1)):
                         return False
 
         return True
@@ -219,8 +220,18 @@ class TetrisGame:
                 self.fallingPiece.rotate_180()
             case _:
                 raise ValueError("This rotation doesn't exist")
-        
 
+    def _placeFallingPiece(self):
+        for col in range(self.fallingPiece.width):
+            for row in range(self.fallingPiece.height):
+                P = self.fallingPiece
+                gridRow = P.row + row
+                gridCol = P.col + col
+                if (P.rotatedPiece[row][col] == '0'):
+                    # Please change this later. This is not readable. But basically our color is associated with the shapeIdx
+                    self.gameBoard[gridRow][gridCol] = P.shapeIdx 
+                    print(f"Grid should be colored at gridRow: {gridRow} and gridCol: {gridCol}")
+                
     # Makes a step in the game
     def play_step(self):
         # List of keys that are pressed
@@ -243,7 +254,6 @@ class TetrisGame:
                         self.shifted = False
                     case pygame.K_DOWN:
                         self._move_falling_piece(0, 1)
-                        # We have a bug here. Check later
                     case pygame.K_CAPSLOCK:
                         self._add_new_falling_piece()
                         print("Hold this piece")
@@ -256,6 +266,9 @@ class TetrisGame:
                     case pygame.K_e:
                         self._rotate_180()
                         print("Rotatin 180")
+                    case pygame.K_SPACE:
+                        self._placeFallingPiece()
+                        print("placed piece")
                     case _:
                         continue
 
