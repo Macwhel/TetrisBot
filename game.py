@@ -2,6 +2,8 @@ import pygame
 import numpy as np
 from typing import List
 import time
+from Models.Piece import Piece
+from Models.Rotations import Rotations
 from Models.Shapes import SHAPES, SHAPE_COLORS
 from Models.Colors import BLACK, WHITE
 from config import *
@@ -10,42 +12,6 @@ from collections import deque
 from enum import Enum
 
 pygame.init()
-
-
-class Rotations(Enum):
-    CLOCKWISE = 1
-    COUNTER_CLOCKWISE = 2
-    ONE_EIGHTY = 3
-
-# TODO: Have each piece have it's own enum value
-class Piece(object):
-    def __init__(self, col: int, row: int, shapeIdx: int):
-        self.col = col
-        self.row = row
-
-        self.shapeIdx = shapeIdx
-        self.shape = SHAPES[shapeIdx]
-        self.color = SHAPE_COLORS[shapeIdx]
-        self.rotation = 0 # This will be in [0, 3], for four different rotated shapes
-        self.update_rotated_piece()
-        self.width = len(self.rotatedPiece[0])
-        self.height = len(self.rotatedPiece)
-
-    def update_rotated_piece(self):
-        self.rotatedPiece = self.shape[self.rotation]
-
-    def rotate_clockwise(self):
-        self.rotation = (self.rotation + 1) % 4
-        self.update_rotated_piece()
-
-    def rotate_counter_clockwise(self):
-        self.rotation = (self.rotation + 3) % 4
-        self.update_rotated_piece()
-
-    def rotate_180(self):
-        self.rotation = (self.rotation + 2) % 4
-        self.update_rotated_piece()
-
 
 class TetrisGame:
 
@@ -113,7 +79,6 @@ class TetrisGame:
                 pygame.draw.rect(self.display, SHAPE_COLORS[self.gameBoard[x][HIDDEN_ROWS + y]], boardSquare)
 
         pygame.display.flip()
-
 
     # Draws the box with the 5 upcoming pieces
     def _draw_upcoming_pieces(self):
@@ -205,7 +170,6 @@ class TetrisGame:
                 return TETRIO_180_KICK_TABLE[rotationIndex]
             case _:
                 return [] # There's a problem
-
                 
     def _handle_wall_kicks(self, rotation):
         tableRow = self._get_wallkick_table_row(rotation)
@@ -224,26 +188,29 @@ class TetrisGame:
     
     # Rotations. Implement kick tables in a bit.
     def _rotate_clockwise(self):
+        self.fallingPiece.save_original_setting()
         self.fallingPiece.rotate_clockwise()
         if not self._is_falling_piece_legal():
             # There's a separate kick table for the I piece
             if self._handle_wall_kicks(Rotations.CLOCKWISE):
                 return
-            self.fallingPiece.rotate_counter_clockwise()
+            self.fallingPiece.reset_setting()
     
     def _rotate_counter_clockwise(self):
+        self.fallingPiece.save_original_setting()
         self.fallingPiece.rotate_counter_clockwise()
         if not self._is_falling_piece_legal():
             if self._handle_wall_kicks(Rotations.COUNTER_CLOCKWISE):
                 return
-            self.fallingPiece.rotate_clockwise()
+            self.fallingPiece.reset_setting()
 
     def _rotate_180(self):
+        self.fallingPiece.save_original_setting()
         self.fallingPiece.rotate_180()
         if not self._is_falling_piece_legal():
             if self._handle_wall_kicks(Rotations.ONE_EIGHTY):
                 return
-            self.fallingPiece.rotate_180()
+            self.fallingPiece.reset_setting()
 
     # Makes a step in the game
     def play_step(self):
