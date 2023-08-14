@@ -1,4 +1,5 @@
 import pygame
+import numpy as np
 from typing import List
 import time
 from Models.Piece import Piece
@@ -28,7 +29,7 @@ class TetrisGame:
     def reset(self):
         # initialize game state
         self.display.fill(BLACK)
-        self.gameBoard = [[(len(SHAPE_COLORS) - 1) for _ in range(10)] for _ in range(40)]
+        self.gameBoard = np.full((40, 10), len(SHAPE_COLORS) - 1)
 
         # Reset piece bag
         self.piece_bag = deque()
@@ -47,7 +48,7 @@ class TetrisGame:
             self._add_pieces_to_bag()
 
         # intialize the piece
-        self.fallingPiece = Piece((COLUMNS - len(SHAPES[fallingPieceIdx][0])) // 2, -3, fallingPieceIdx)
+        self.fallingPiece = Piece((COLUMNS - len(SHAPES[fallingPieceIdx][0])) // 2, PIECE_SPAWN_HEIGHT_OFFSET, fallingPieceIdx)
         
         # update the game board
         self._draw_falling_piece()
@@ -77,7 +78,7 @@ class TetrisGame:
                 shiftedX = (x * BLOCK_SIZE) + TOP_LEFT_X_COORDINATE
                 shiftedY = (y * BLOCK_SIZE) + TOP_LEFT_Y_COORDINATE
                 boardSquare = pygame.Rect(shiftedX, shiftedY, BLOCK_SIZE, BLOCK_SIZE)
-                pygame.draw.rect(self.display, SHAPE_COLORS[self.gameBoard[HIDDEN_ROWS + y][x]], boardSquare)
+                pygame.draw.rect(self.display, SHAPE_COLORS[self.gameBoard[HIDDEN_ROWS + y, x]], boardSquare)
 
         pygame.display.flip()
 
@@ -137,7 +138,7 @@ class TetrisGame:
                     if (xCoord < 0 
                         or xCoord >= COLUMNS
                         or yCoord >= 40
-                        or self.gameBoard[yCoord][xCoord] != (len(SHAPE_COLORS) - 1)):
+                        or self.gameBoard[yCoord, xCoord] != (len(SHAPE_COLORS) - 1)):
                         return False
 
         return True
@@ -221,7 +222,7 @@ class TetrisGame:
             case _:
                 raise ValueError("This rotation doesn't exist")
 
-    def _placeFallingPiece(self):
+    def _place_falling_piece(self):
         for col in range(self.fallingPiece.width):
             for row in range(self.fallingPiece.height):
                 P = self.fallingPiece
@@ -229,9 +230,38 @@ class TetrisGame:
                 gridCol = P.col + col
                 if (P.rotatedPiece[row][col] == '0'):
                     # Please change this later. This is not readable. But basically our color is associated with the shapeIdx
-                    self.gameBoard[gridRow][gridCol] = P.shapeIdx 
-                    print(f"Grid should be colored at gridRow: {gridRow} and gridCol: {gridCol}")
-        pp.pprint(self.gameBoard)
+                    self.gameBoard[gridRow, gridCol] = P.shapeIdx 
+        self._remove_full_rows()
+        self._add_new_falling_piece()
+
+    def _move_piece_to_bottom(self):
+        for _ in range(VISIBLE_ROWS - PIECE_SPAWN_HEIGHT_OFFSET):
+            self._move_falling_piece(0, 1)
+
+    def _hard_drop(self):
+        self._move_piece_to_bottom()
+        self._place_falling_piece()
+    
+    def _soft_drop(self):
+        self._move_piece_to_bottom()
+    
+    # Written by chatgpt
+    def _remove_full_rows(self):
+        # Find rows that contain the number 7
+        mask = np.any(self.gameBoard == 7, axis=1)
+        
+        # Keep only those rows
+        filtered_matrix = self.gameBoard[mask]
+        
+        # Calculate the number of rows to be filled with 7s
+        num_rows_to_fill = self.gameBoard.shape[0] - filtered_matrix.shape[0]
+        
+        # Create rows filled with 7s
+        rows_of_7s = np.full((num_rows_to_fill, self.gameBoard.shape[1]), 7)
+        
+        # Concatenate the rows of 7s and the filtered matrix
+        self.gameBoard = np.vstack((rows_of_7s, filtered_matrix))
+
                 
     # Makes a step in the game
     def play_step(self):
@@ -254,7 +284,7 @@ class TetrisGame:
                         self.key_down_time = time.time()
                         self.shifted = False
                     case pygame.K_DOWN:
-                        self._move_falling_piece(0, 1)
+                        self._move_piece_to_bottom()
                     case pygame.K_CAPSLOCK:
                         self._add_new_falling_piece()
                         print("Hold this piece")
@@ -268,7 +298,7 @@ class TetrisGame:
                         self._rotate_180()
                         print("Rotatin 180")
                     case pygame.K_SPACE:
-                        self._placeFallingPiece()
+                        self._hard_drop()
                         print("placed piece")
                     case _:
                         continue
