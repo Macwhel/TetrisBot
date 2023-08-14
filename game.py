@@ -225,12 +225,13 @@ class TetrisGame:
         for col in range(self.fallingPiece.width):
             for row in range(self.fallingPiece.height):
                 P = self.fallingPiece
-                gridRow = P.row + row
+                gridRow = P.row + row + HIDDEN_ROWS
                 gridCol = P.col + col
                 if (P.rotatedPiece[row][col] == '0'):
                     # Please change this later. This is not readable. But basically our color is associated with the shapeIdx
                     self.gameBoard[gridRow][gridCol] = P.shapeIdx 
                     print(f"Grid should be colored at gridRow: {gridRow} and gridCol: {gridCol}")
+        pp.pprint(self.gameBoard)
                 
     # Makes a step in the game
     def play_step(self):
