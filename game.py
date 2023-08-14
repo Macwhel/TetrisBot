@@ -186,9 +186,7 @@ class TetrisGame:
 
         return False
     
-    # Rotations. Implement kick tables in a bit.
     def _rotate_clockwise(self):
-        self.fallingPiece.save_original_setting()
         self.fallingPiece.rotate_clockwise()
         if not self._is_falling_piece_legal():
             # There's a separate kick table for the I piece
@@ -197,7 +195,6 @@ class TetrisGame:
             self.fallingPiece.reset_setting()
     
     def _rotate_counter_clockwise(self):
-        self.fallingPiece.save_original_setting()
         self.fallingPiece.rotate_counter_clockwise()
         if not self._is_falling_piece_legal():
             if self._handle_wall_kicks(Rotations.COUNTER_CLOCKWISE):
@@ -205,12 +202,24 @@ class TetrisGame:
             self.fallingPiece.reset_setting()
 
     def _rotate_180(self):
-        self.fallingPiece.save_original_setting()
-        self.fallingPiece.rotate_180()
+        self._rotate(Rotations.ONE_EIGHTY)
         if not self._is_falling_piece_legal():
             if self._handle_wall_kicks(Rotations.ONE_EIGHTY):
                 return
             self.fallingPiece.reset_setting()
+
+    def _rotate(self, rotation):
+        self.fallingPiece.save_original_setting()
+        match rotation:
+            case Rotations.CLOCKWISE:
+                self.fallingPiece.rotate_clockwise()
+            case Rotations.COUNTER_CLOCKWISE:
+                self.fallingPiece.rotate_counter_clockwise()
+            case Rotations.ONE_EIGHTY:
+                self.fallingPiece.rotate_180()
+            case _:
+                raise ValueError("This rotation doesn't exist")
+        
 
     # Makes a step in the game
     def play_step(self):
