@@ -1,3 +1,6 @@
+from Models.Stats import Stats
+from Renders.Time import draw_timer
+from Renders.UpcomingPieces import draw_upcoming_pieces
 from Utils.Movement.DAS import DAS, Direction
 from Utils.Movement.Drops import hard_drop, move_piece_to_bottom
 from Utils.FallingPiece.AddNewFallingPiece import add_new_falling_piece
@@ -8,11 +11,11 @@ from Models.Shapes import SHAPE_COLORS
 from Models.Colors import BLACK
 from Renders.Grid import draw_falling_piece, draw_grid
 from Renders.HoldPiece import draw_hold_piece, draw_hold_piece_background
-from Renders.UpcomingPieces import draw_upcoming_pieces
 from Utils.FallingPiece.MoveFallingPiece import move_piece
 from Utils.Gravity.IncreaseGravity import increase_gravity
 from Utils.PieceBag.AddPiecesToBag import add_pieces_to_bag
 from Utils.Rotations.Rotations import *
+from Utils.Time.ParseElapsedTime import parseElapsedTime
 from config import *
 from collections import deque
 
@@ -38,6 +41,8 @@ class TetrisGame:
         self.key_down_time = None
         self.shifted = False
         pygame.time.set_timer(INCREASE_GRAVITY_EVENT, MILISECONDS_TO_INCREMENT_GRAVITY)
+        self.font = pygame.font.Font(None, 36)
+
         self.reset()
 
     def reset(self):
@@ -61,6 +66,15 @@ class TetrisGame:
         # Hold piece
         self.hold_piece_changed = False
         self.hold_piece = None
+
+        # Reset last time value
+        self.last_rendered_timer_value = None
+
+        # Reset number of pieces placed
+        self.pieces_placed = 0
+
+        # Reset the statistics
+        self.stats = Stats()
 
     # This shit is a bit annoying to refactor
     def _hold_piece(self):
@@ -172,6 +186,14 @@ class TetrisGame:
                 self.key_down_time = None
                 draw_grid(self.display, self.gameBoard)
                 draw_falling_piece(self.display, self.fallingPiece)
+
+        minutes, seconds, milliseconds = self.stats.getMinutesSecondsMilliseconds()
+
+        if (minutes, seconds, milliseconds) != self.last_rendered_timer_value:
+            # If the value changed, update last rendered timer value
+            self.last_rendered_timer_value = (minutes, seconds, milliseconds)
+
+            draw_timer(self.font, self.display, minutes, seconds, milliseconds)
 
 
 if __name__ == "__main__":
