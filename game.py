@@ -122,19 +122,19 @@ class TetrisGame:
         self._draw_hold_piece_background()
         P = self.hold_piece
         if P:
-            rowIdxOffset = 0
+            iPieceOffset = 0
             if P.shapeIdx == 0:
-                rowIdxOffset = 1
+                iPieceOffset = 1
             numberOfXSections = P.piece_width + 2 # type: ignore
-            numberOfYSections = P.piece_height + 2 # type: ignore
+            numberOfYSections = P.piece_height + 2 + 2 * iPieceOffset # type: ignore
 
             lengthOfEachXSection = HOLD_PIECE_SCREEN_WIDTH / numberOfXSections
             lengthOfEachYSection = HOLD_PIECE_SCREEN_HEIGHT / numberOfYSections
             for col in range(P.piece_width):
                 for row in range(P.piece_height):
-                    if P.rotatedPiece[row + rowIdxOffset][col] == '0':
+                    if P.rotatedPiece[row + iPieceOffset][col] == '0':
                         holdPieceXCoord = HOLD_PIECE_SCREEN_LEFT_X_COORDINATE + (col + 1) * lengthOfEachXSection
-                        holdPieceYCoord = HOLD_PIECE_SCREEN_TOP_Y_COORDINATE + (row + 1) * lengthOfEachYSection
+                        holdPieceYCoord = HOLD_PIECE_SCREEN_TOP_Y_COORDINATE + (row + 1 + iPieceOffset) * lengthOfEachYSection
                         holdPieceSquare = pygame.Rect(
                             holdPieceXCoord,
                             holdPieceYCoord,
