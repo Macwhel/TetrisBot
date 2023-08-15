@@ -83,15 +83,15 @@ class TetrisGame:
     # Draws the playing grid and the placed pieces
     def _draw_grid(self):
         self._draw_columns_above_grid()
-
+        rectangles = []
         for x in range(COLUMNS):
             for y in range(VISIBLE_ROWS):
                 shiftedX = (x * BLOCK_SIZE) + TOP_LEFT_X_COORDINATE
                 shiftedY = (y * BLOCK_SIZE) + TOP_LEFT_Y_COORDINATE
                 boardSquare = pygame.Rect(shiftedX, shiftedY, BLOCK_SIZE, BLOCK_SIZE)
-                pygame.draw.rect(self.display, SHAPE_COLORS[self.gameBoard[HIDDEN_ROWS + y, x]], boardSquare)
+                rectangles.append(pygame.draw.rect(self.display, SHAPE_COLORS[self.gameBoard[HIDDEN_ROWS + y, x]], boardSquare))
 
-        pygame.display.flip()
+        pygame.display.update(rectangles)
 
     # Draws the box with the 5 upcoming pieces
     def _draw_upcoming_pieces(self):
@@ -101,9 +101,9 @@ class TetrisGame:
             UPCOMING_PIECES_SCREEN_WIDTH,
             UPCOMING_PIECES_SCREEN_HEIGHT)
         
-        pygame.draw.rect(self.display, WHITE, upcomingPiecesDisplayArea)
+        rectangles = [pygame.draw.rect(self.display, WHITE, upcomingPiecesDisplayArea)]
 
-        pygame.display.flip()
+        pygame.display.update(rectangles)
 
     # Draws the box with the hold piece
     def _draw_hold_piece_background(self):
@@ -114,9 +114,9 @@ class TetrisGame:
             HOLD_PIECE_SCREEN_HEIGHT
         )
 
-        pygame.draw.rect(self.display, WHITE, holdPieceDisplayArea)
+        rectangles = [pygame.draw.rect(self.display, WHITE, holdPieceDisplayArea)]
 
-        pygame.display.flip()
+        pygame.display.update(rectangles)
     
     def _draw_hold_piece(self):
         self._draw_hold_piece_background()
@@ -130,6 +130,7 @@ class TetrisGame:
 
             lengthOfEachXSection = HOLD_PIECE_SCREEN_WIDTH / numberOfXSections
             lengthOfEachYSection = HOLD_PIECE_SCREEN_HEIGHT / numberOfYSections
+            rectangles = []
             for col in range(P.piece_width):
                 for row in range(P.piece_height):
                     if P.rotatedPiece[row + iPieceOffset][col] == '0':
@@ -142,9 +143,9 @@ class TetrisGame:
                             lengthOfEachYSection
                         )
 
-                        pygame.draw.rect(self.display, P.color, holdPieceSquare)
+                        rectangles.append(pygame.draw.rect(self.display, P.color, holdPieceSquare))
 
-            pygame.display.flip()
+            pygame.display.update(rectangles)
 
     def _hold_piece(self):
         self.fallingPiece.reset_to_original()
@@ -158,6 +159,7 @@ class TetrisGame:
 
     # In charge of drawing the falling piece
     def _draw_falling_piece(self):
+        rectangles = []
         for col in range(self.fallingPiece.width):
             for row in range(self.fallingPiece.height):
                 P = self.fallingPiece
@@ -174,8 +176,10 @@ class TetrisGame:
                         BLOCK_SIZE
                     )
 
-                    pygame.draw.rect(self.display, P.color, fallingPieceSquare)
+                    rectangles.append(pygame.draw.rect(self.display, P.color, fallingPieceSquare))
 
+        # Add a section to update the invisible section
+        # pygame.display.update(rectangles)
         pygame.display.flip()
 
     def _is_falling_piece_legal(self):
