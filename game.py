@@ -12,6 +12,8 @@ from collections import deque
 import pprint as pp
 
 pygame.init()
+GRAVITY_EVENT = pygame.USEREVENT + 1
+INCREASE_GRAVITY_EVENT = pygame.USEREVENT + 2
 
 class TetrisGame:
 
@@ -24,6 +26,7 @@ class TetrisGame:
         self.clock = pygame.time.Clock()
         self.key_down_time = None
         self.shifted = False
+        pygame.time.set_timer(INCREASE_GRAVITY_EVENT, MILISECONDS_TO_INCREMENT_GRAVITY)
         self.reset()
 
     def reset(self):
@@ -38,6 +41,10 @@ class TetrisGame:
         self._draw_grid()
         self._draw_upcoming_pieces()
         self._draw_hold_piece()
+
+        # Reset Gravity speed
+        self.G = 0
+        self._increase_gravity(1/60)
 
     # Add the new piece at game start and when another piece is placed
     def _add_new_falling_piece(self):
@@ -262,12 +269,19 @@ class TetrisGame:
         # Concatenate the rows of 7s and the filtered matrix
         self.gameBoard = np.vstack((rows_of_7s, filtered_matrix))
 
+    def _increase_gravity(self, dg):
+        self.G += dg
+        pygame.time.set_timer(GRAVITY_EVENT, G_to_miliseconds_per_row(self.G))
                 
     # Makes a step in the game
     def play_step(self):
         # List of keys that are pressed
         keys = pygame.key.get_pressed()
         for event in pygame.event.get():
+            if event.type == INCREASE_GRAVITY_EVENT:
+                self._increase_gravity(GRAVITY_INCREMENTATION)
+            if event.type == GRAVITY_EVENT:
+                self._move_falling_piece(0, 1)
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
