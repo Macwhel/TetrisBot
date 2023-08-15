@@ -1,4 +1,4 @@
-from Utils.Drop.Drops import hard_drop, move_piece_to_bottom
+from Utils.Movement.Drops import hard_drop, move_piece_to_bottom
 from Utils.FallingPiece.AddNewFallingPiece import add_new_falling_piece
 import pygame
 import numpy as np
