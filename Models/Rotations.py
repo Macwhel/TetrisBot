@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class Rotations(Enum):
     CLOCKWISE = 1
     COUNTER_CLOCKWISE = 2

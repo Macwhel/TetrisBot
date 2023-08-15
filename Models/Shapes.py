@@ -1,6 +1,7 @@
 from enum import Enum
 from Models.Colors import *
 
+# fmt: off
 I = [
     ['....',
      '0000',
@@ -105,9 +106,11 @@ Z = [
      '00.',
      '0..']
 ]
+# fmt: on
 
 SHAPES = [I, J, L, O, S, T, Z]
 SHAPE_COLORS = [CYAN, BLUE, ORANGE, YELLOW, GREEN, PURPLE, RED, WHITE]
+
 
 class Shapes(Enum):
     I = 0
@@ -117,6 +120,7 @@ class Shapes(Enum):
     S = 4
     T = 5
     Z = 6
+
 
 def shape_height(shapeIdx):
     match shapeIdx:

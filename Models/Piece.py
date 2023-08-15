@@ -1,5 +1,6 @@
 from Models.Shapes import SHAPE_COLORS, SHAPES, shape_height
 
+
 # TODO: Have each piece have it's own enum value
 class Piece(object):
     def __init__(self, col: int, row: int, shapeIdx: int):
@@ -9,7 +10,7 @@ class Piece(object):
         self.shapeIdx = shapeIdx
         self.shape = SHAPES[shapeIdx]
         self.color = SHAPE_COLORS[shapeIdx]
-        self.rotation = self.resetRotation = 0 # This will be in [0, 3], for four different rotated shapes
+        self.rotation = self.resetRotation = 0
         self.update_rotated_piece()
 
         self.width = len(self.rotatedPiece[0])
@@ -38,7 +39,7 @@ class Piece(object):
         self.resetCol = self.col
         self.resetRow = self.row
         self.resetRotation = self.rotation
-    
+
     # Sets the col, row, and rotation
     def reset_setting(self):
         self.col = self.resetCol
