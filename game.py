@@ -20,9 +20,7 @@ pygame.init()
 GRAVITY_EVENT = pygame.USEREVENT + 1
 INCREASE_GRAVITY_EVENT = pygame.USEREVENT + 2
 """
-TODO: 
-transition to throwing all the drawing in another file
-add DAS-ing (naive implementation)
+TODO:
 Make a class that has fallingPiece and gameBoard
 """
 
@@ -60,6 +58,7 @@ class TetrisGame:
         self.hold_piece_changed = False
         self.hold_piece = None
 
+    # This shit is a bit annoying to refactor
     def _hold_piece(self):
         self.fallingPiece.reset_to_original()
         if not self.hold_piece:
@@ -115,7 +114,7 @@ class TetrisGame:
                         )
                         print("Rotatin 180")
                     case pygame.K_SPACE:
-                        self.fallingPiece = hard_drop(
+                        self.fallingPiece, self.gameBoard = hard_drop(
                             self.fallingPiece,
                             self.gameBoard,
                             self.display,

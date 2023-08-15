@@ -1,7 +1,5 @@
 from enum import Enum
-from Renders.Grid import draw_falling_piece
 from Utils.FallingPiece.MoveFallingPiece import move_piece
-from Utils.FallingPiece.PlaceFallingPiece import place_falling_piece
 
 from config import COLUMNS
 

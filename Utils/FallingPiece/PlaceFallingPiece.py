@@ -12,5 +12,6 @@ def place_falling_piece(fallingPiece, gameBoard, display, pieceBag):
             if P.rotatedPiece[row][col] == "0":
                 # Please change this later. This is not readable. But basically our color is associated with the shapeIdx
                 gameBoard[gridRow, gridCol] = P.shapeIdx
-    remove_full_rows(gameBoard)
-    return add_new_falling_piece(display, pieceBag)
+    gameBoard = remove_full_rows(gameBoard)
+
+    return (add_new_falling_piece(display, pieceBag), gameBoard)

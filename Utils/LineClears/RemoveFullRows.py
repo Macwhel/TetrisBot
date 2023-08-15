@@ -1,19 +1,19 @@
 import numpy as np
+import pprint as pp
+
+from Renders.Grid import draw_grid
 
 
 # Written by chatgpt
 def remove_full_rows(gameBoard):
-    # Find rows that contain the number 7
-    mask = np.any(gameBoard == 7, axis=1)
+    # Filter out rows that contain the number 7
+    filtered_arr = gameBoard[np.any(gameBoard == 7, axis=1)]
 
-    # Keep only those rows
-    filtered_matrix = gameBoard[mask]
+    # Calculate the number of removed rows
+    num_removed_rows = gameBoard.shape[0] - filtered_arr.shape[0]
 
-    # Calculate the number of rows to be filled with 7s
-    num_rows_to_fill = gameBoard.shape[0] - filtered_matrix.shape[0]
+    # Create new rows of 7s
+    new_rows = np.full((num_removed_rows, gameBoard.shape[1]), 7)
 
-    # Create rows filled with 7s
-    rows_of_7s = np.full((num_rows_to_fill, gameBoard.shape[1]), 7)
-
-    # Concatenate the rows of 7s and the filtered matrix
-    gameBoard = np.vstack((rows_of_7s, filtered_matrix))
+    # Add the new rows to the top of the filtered array
+    return np.vstack((new_rows, filtered_arr))
