@@ -40,11 +40,15 @@ class TetrisGame:
         self._add_new_falling_piece()
         self._draw_grid()
         self._draw_upcoming_pieces()
-        self._draw_hold_piece()
+        self._draw_hold_piece_background()
 
         # Reset Gravity speed
         self.G = 0
         self._increase_gravity(1/60)
+
+        # Hold piece
+        self.hold_piece_changed = False
+        self.hold_piece = None
 
     # Add the new piece at game start and when another piece is placed
     def _add_new_falling_piece(self):
@@ -102,7 +106,7 @@ class TetrisGame:
         pygame.display.flip()
 
     # Draws the box with the hold piece
-    def _draw_hold_piece(self):
+    def _draw_hold_piece_background(self):
         holdPieceDisplayArea = pygame.Rect(
             HOLD_PIECE_SCREEN_LEFT_X_COORDINATE,
             HOLD_PIECE_SCREEN_TOP_Y_COORDINATE,
@@ -113,6 +117,44 @@ class TetrisGame:
         pygame.draw.rect(self.display, WHITE, holdPieceDisplayArea)
 
         pygame.display.flip()
+    
+    def _draw_hold_piece(self):
+        self._draw_hold_piece_background()
+        P = self.hold_piece
+        if P:
+            rowIdxOffset = 0
+            if P.shapeIdx == 0:
+                rowIdxOffset = 1
+            numberOfXSections = P.piece_width + 2 # type: ignore
+            numberOfYSections = P.piece_height + 2 # type: ignore
+
+            lengthOfEachXSection = HOLD_PIECE_SCREEN_WIDTH / numberOfXSections
+            lengthOfEachYSection = HOLD_PIECE_SCREEN_HEIGHT / numberOfYSections
+            for col in range(P.piece_width):
+                for row in range(P.piece_height):
+                    if P.rotatedPiece[row + rowIdxOffset][col] == '0':
+                        holdPieceXCoord = HOLD_PIECE_SCREEN_LEFT_X_COORDINATE + (col + 1) * lengthOfEachXSection
+                        holdPieceYCoord = HOLD_PIECE_SCREEN_TOP_Y_COORDINATE + (row + 1) * lengthOfEachYSection
+                        holdPieceSquare = pygame.Rect(
+                            holdPieceXCoord,
+                            holdPieceYCoord,
+                            lengthOfEachXSection,
+                            lengthOfEachYSection
+                        )
+
+                        pygame.draw.rect(self.display, P.color, holdPieceSquare)
+
+            pygame.display.flip()
+
+    def _hold_piece(self):
+        self.fallingPiece.reset_to_original()
+        if not self.hold_piece:
+            self.hold_piece = self.fallingPiece
+            self._add_new_falling_piece()
+        else:
+            self.hold_piece, self.fallingPiece = self.fallingPiece, self.hold_piece
+
+        self._draw_hold_piece()
 
     # In charge of drawing the falling piece
     def _draw_falling_piece(self):
@@ -300,7 +342,7 @@ class TetrisGame:
                     case pygame.K_DOWN:
                         self._move_piece_to_bottom()
                     case pygame.K_CAPSLOCK:
-                        self._add_new_falling_piece()
+                        self._hold_piece()
                         print("Hold this piece")
                     case pygame.K_q:
                         self._rotate_counter_clockwise()
