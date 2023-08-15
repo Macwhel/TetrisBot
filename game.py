@@ -125,7 +125,8 @@ class TetrisGame:
                             self.display,
                             self.pieceBag,
                         )
-                        print("placed piece")
+                    case pygame.K_r:
+                        self.reset()
                     case _:
                         continue
 
@@ -141,14 +142,12 @@ class TetrisGame:
                         self.gameBoard,
                         Direction.LEFT,
                     )
-                    print("DAS-ing left")
                 elif keys[pygame.K_RIGHT]:
                     DAS(
                         self.fallingPiece,
                         self.gameBoard,
                         Direction.RIGHT,
                     )
-                    print("DAS-ing right")
 
             draw_grid(self.display, self.gameBoard)
             draw_falling_piece(self.display, self.fallingPiece)
@@ -162,14 +161,12 @@ class TetrisGame:
                         self.gameBoard,
                         Direction.LEFT,
                     )
-                    print("DAS-ing left")
                 elif keys[pygame.K_RIGHT]:
                     DAS(
                         self.fallingPiece,
                         self.gameBoard,
                         Direction.RIGHT,
                     )
-                    print("DAS-ing right")
                 self.currentlyDASing = True
                 self.shifted = True
                 self.key_down_time = None
