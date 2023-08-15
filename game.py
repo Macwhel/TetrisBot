@@ -15,6 +15,12 @@ pygame.init()
 GRAVITY_EVENT = pygame.USEREVENT + 1
 INCREASE_GRAVITY_EVENT = pygame.USEREVENT + 2
 
+'''
+TODO: 
+Transition to pygame.update
+transition to throwing all the drawing in another file
+'''
+
 class TetrisGame:
 
     def __init__(self):
