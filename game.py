@@ -201,7 +201,7 @@ class TetrisGame:
         apm = self.stats.getAPM()
         if apm != self.last_rendered_apm_value:
             self.last_rendered_apm_value = apm
-            draw_apm()
+            draw_apm(self.font, self.display, self.stats)
 
         pps = self.stats.getPPS()
         if pps != self.last_rendered_pps_value:
