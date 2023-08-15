@@ -21,7 +21,7 @@ GRAVITY_EVENT = pygame.USEREVENT + 1
 INCREASE_GRAVITY_EVENT = pygame.USEREVENT + 2
 """
 TODO:
-Make it so that you cant constantly do the colors
+Have hardcoded "images" of the pieces that I can just throw onto the queue or smth
 Draw the upcoming pieces
 Make a class that has fallingPiece and gameBoard
 """
@@ -52,7 +52,7 @@ class TetrisGame:
             self.display, self.pieceBag
         )
         draw_grid(self.display, self.gameBoard)
-        draw_upcoming_pieces(self.display)
+        draw_upcoming_pieces(self.display, self.pieceBag)
         draw_hold_piece_background(self.display)
 
         # Reset Gravity speed
