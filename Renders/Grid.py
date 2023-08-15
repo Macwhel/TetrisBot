@@ -30,7 +30,7 @@ def draw_falling_piece(display, fallingPiece):
     pygame.display.update(rectangles)
 
 
-def draw_columns_above_grid(display):
+def draw_rows_above_grid(display, gameBoard):
     rectangles = []
     for x in range(COLUMNS):
         for y in range(COLUMNS_ABOVE_GRID):
@@ -42,7 +42,7 @@ def draw_columns_above_grid(display):
 
 
 def draw_grid(display, gameBoard):
-    rectangles = draw_columns_above_grid(display)
+    rectangles = draw_rows_above_grid(display, gameBoard)
     for x in range(COLUMNS):
         for y in range(VISIBLE_ROWS):
             shiftedX = (x * BLOCK_SIZE) + TOP_LEFT_X_COORDINATE

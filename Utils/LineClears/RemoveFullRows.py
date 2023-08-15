@@ -2,7 +2,7 @@ import numpy as np
 
 
 # Written by chatgpt
-def remove_full_rows(gameBoard):  # python is being annoying
+def remove_full_rows(gameBoard):
     # Find rows that contain the number 7
     mask = np.any(gameBoard == 7, axis=1)
 

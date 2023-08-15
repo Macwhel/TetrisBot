@@ -128,3 +128,7 @@ def shape_height(shapeIdx):
             return 1
         case _:
             return 2
+
+
+def shape_color(shapeIdx):
+    return SHAPE_COLORS[shapeIdx]

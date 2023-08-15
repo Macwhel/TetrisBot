@@ -1,3 +1,4 @@
+from Utils.Movement.DAS import DAS, Direction
 from Utils.Movement.Drops import hard_drop, move_piece_to_bottom
 from Utils.FallingPiece.AddNewFallingPiece import add_new_falling_piece
 import pygame
@@ -8,7 +9,7 @@ from Models.Colors import BLACK
 from Renders.Grid import draw_falling_piece, draw_grid
 from Renders.HoldPiece import draw_hold_piece, draw_hold_piece_background
 from Renders.UpcomingPieces import draw_upcoming_pieces
-from Utils.FallingPiece.MoveFallingPiece import move_falling_piece
+from Utils.FallingPiece.MoveFallingPiece import move_piece
 from Utils.Gravity.IncreaseGravity import increase_gravity
 from Utils.PieceBag.AddPiecesToBag import add_pieces_to_bag
 from Utils.Rotations.Rotations import *
@@ -22,6 +23,7 @@ INCREASE_GRAVITY_EVENT = pygame.USEREVENT + 2
 TODO: 
 transition to throwing all the drawing in another file
 add DAS-ing (naive implementation)
+Make a class that has fallingPiece and gameBoard
 """
 
 
@@ -76,7 +78,7 @@ class TetrisGame:
             if event.type == INCREASE_GRAVITY_EVENT:
                 self.G = increase_gravity(self.G, GRAVITY_INCREMENTATION)
             if event.type == GRAVITY_EVENT:
-                move_falling_piece(self.fallingPiece, self.gameBoard, 0, 1)
+                move_piece(self.fallingPiece, self.gameBoard, 0, 1)
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
@@ -84,12 +86,12 @@ class TetrisGame:
                 match event.key:
                     case pygame.K_LEFT:
                         print("going left")
-                        move_falling_piece(self.fallingPiece, self.gameBoard, -1, 0)
+                        move_piece(self.fallingPiece, self.gameBoard, -1, 0)
                         self.key_down_time = time.time()
                         self.shifted = False
                     case pygame.K_RIGHT:
                         print("going right")
-                        move_falling_piece(self.fallingPiece, self.gameBoard, 1, 0)
+                        move_piece(self.fallingPiece, self.gameBoard, 1, 0)
                         self.key_down_time = time.time()
                         self.shifted = False
                     case pygame.K_DOWN:
@@ -133,11 +135,23 @@ class TetrisGame:
         if self.key_down_time is not None and not self.shifted:
             if time.time() - self.key_down_time > DAS_DELAY:
                 if keys[pygame.K_LEFT]:
+                    DAS(
+                        self.fallingPiece,
+                        self.gameBoard,
+                        Direction.LEFT,
+                    )
                     print("DAS-ing left")
                 elif keys[pygame.K_RIGHT]:
+                    DAS(
+                        self.fallingPiece,
+                        self.gameBoard,
+                        Direction.RIGHT,
+                    )
                     print("DAS-ing right")
                 self.shifted = True
                 self.key_down_time = None
+                draw_grid(self.display, self.gameBoard)
+                draw_falling_piece(self.display, self.fallingPiece)
 
 
 if __name__ == "__main__":
