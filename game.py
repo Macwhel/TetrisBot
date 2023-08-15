@@ -21,6 +21,8 @@ GRAVITY_EVENT = pygame.USEREVENT + 1
 INCREASE_GRAVITY_EVENT = pygame.USEREVENT + 2
 """
 TODO:
+Make it so that you cant constantly do the colors
+Draw the upcoming pieces
 Make a class that has fallingPiece and gameBoard
 """
 
@@ -46,7 +48,9 @@ class TetrisGame:
         # Reset piece bag
         self.pieceBag = deque()
         add_pieces_to_bag(self.pieceBag)
-        self.fallingPiece = add_new_falling_piece(self.display, self.pieceBag)
+        self.fallingPiece, self.already_held = add_new_falling_piece(
+            self.display, self.pieceBag
+        )
         draw_grid(self.display, self.gameBoard)
         draw_upcoming_pieces(self.display)
         draw_hold_piece_background(self.display)
@@ -60,14 +64,18 @@ class TetrisGame:
 
     # This shit is a bit annoying to refactor
     def _hold_piece(self):
-        self.fallingPiece.reset_to_original()
-        if not self.hold_piece:
-            self.hold_piece = self.fallingPiece
-            self.fallingPiece = add_new_falling_piece(self.display, self.pieceBag)
-        else:
-            self.hold_piece, self.fallingPiece = self.fallingPiece, self.hold_piece
+        if not self.already_held:
+            self.fallingPiece.reset_to_original()
+            if not self.hold_piece:
+                self.hold_piece = self.fallingPiece
+                self.fallingPiece, _ = add_new_falling_piece(
+                    self.display, self.pieceBag
+                )
+            else:
+                self.hold_piece, self.fallingPiece = self.fallingPiece, self.hold_piece
 
-        draw_hold_piece(self.display, self.hold_piece)
+            self.already_held = True
+            draw_hold_piece(self.display, self.hold_piece)
 
     # Makes a step in the game
     def play_step(self):
@@ -108,7 +116,10 @@ class TetrisGame:
                             self.gameBoard,
                         )
                     case pygame.K_SPACE:
-                        self.fallingPiece, self.gameBoard = hard_drop(
+                        (
+                            self.fallingPiece,
+                            self.already_held,
+                        ), self.gameBoard = hard_drop(
                             self.fallingPiece,
                             self.gameBoard,
                             self.display,

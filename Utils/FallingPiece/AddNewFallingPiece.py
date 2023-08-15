@@ -23,4 +23,4 @@ def add_new_falling_piece(display, piece_bag):
     # update the game board
     draw_falling_piece(display, fallingPiece)
 
-    return fallingPiece
+    return fallingPiece, False
