@@ -1,5 +1,5 @@
 from Models.Stats import Stats
-from Renders.Time import draw_timer
+from Renders.Stats import draw_apm, draw_pps, draw_timer
 from Renders.UpcomingPieces import draw_upcoming_pieces
 from Utils.Movement.DAS import DAS, Direction
 from Utils.Movement.Drops import hard_drop, move_piece_to_bottom
@@ -67,8 +67,10 @@ class TetrisGame:
         self.hold_piece_changed = False
         self.hold_piece = None
 
-        # Reset last time value
+        # Reset last rendered values
         self.last_rendered_timer_value = None
+        self.last_rendered_pps_value = None
+        self.last_rendered_apm_value = None
 
         # Reset number of pieces placed
         self.pieces_placed = 0
@@ -138,6 +140,7 @@ class TetrisGame:
                             self.gameBoard,
                             self.display,
                             self.pieceBag,
+                            self.stats.incrementTotalPiecesPlaced,
                         )
                     case pygame.K_r:
                         self.reset()
@@ -194,6 +197,16 @@ class TetrisGame:
             self.last_rendered_timer_value = (minutes, seconds, milliseconds)
 
             draw_timer(self.font, self.display, minutes, seconds, milliseconds)
+
+        apm = self.stats.getAPM()
+        if apm != self.last_rendered_apm_value:
+            self.last_rendered_apm_value = apm
+            draw_apm()
+
+        pps = self.stats.getPPS()
+        if pps != self.last_rendered_pps_value:
+            self.last_rendered_pps_value = pps
+            draw_pps(self.font, self.display, self.stats)
 
 
 if __name__ == "__main__":

@@ -12,11 +12,11 @@ class Stats(object):
     def incrementTotalLinesSent(self, lines):
         self.totalLinesSent += lines
 
-    def getElapsedTime(self):
+    def getElapsedTimeInSeconds(self):
         return time.time() - self.startTime
 
     def getMinutesSecondsMilliseconds(self):
-        elapsed_time = self.getElapsedTime()
+        elapsed_time = self.getElapsedTimeInSeconds()
         minutes = int(elapsed_time // 60)
         seconds = int(elapsed_time % 60)
         milliseconds = int((elapsed_time * 1000) % 1000)
@@ -24,4 +24,13 @@ class Stats(object):
         return minutes, seconds, milliseconds
 
     def getMinutes(self):
-        return self.getElapsedTime() / 60
+        return self.getElapsedTimeInSeconds() / 60
+
+    def getSeconds(self):
+        return self.getElapsedTimeInSeconds()
+
+    def getAPM(self):
+        return round(self.totalLinesSent / self.getMinutes(), 2)
+
+    def getPPS(self):
+        return round(self.totalPiecesPlaced / self.getSeconds(), 2)

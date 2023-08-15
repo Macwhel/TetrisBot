@@ -8,9 +8,9 @@ def move_piece_to_bottom(piece, gameBoard):
         move_piece(piece, gameBoard, 0, 1)
 
 
-def hard_drop(fallingPiece, gameBoard, display, pieceBag):
+def hard_drop(fallingPiece, gameBoard, display, pieceBag, callback=None):
     move_piece_to_bottom(fallingPiece, gameBoard)
-    return place_falling_piece(fallingPiece, gameBoard, display, pieceBag)
+    return place_falling_piece(fallingPiece, gameBoard, display, pieceBag, callback)
 
 
 def soft_drop(fallingPiece, gameBoard):

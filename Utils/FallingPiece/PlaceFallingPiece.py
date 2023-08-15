@@ -3,7 +3,7 @@ from Utils.LineClears.RemoveFullRows import remove_full_rows
 from config import HIDDEN_ROWS
 
 
-def place_falling_piece(fallingPiece, gameBoard, display, pieceBag):
+def place_falling_piece(fallingPiece, gameBoard, display, pieceBag, callback=None):
     for col in range(fallingPiece.width):
         for row in range(fallingPiece.height):
             P = fallingPiece
@@ -13,5 +13,8 @@ def place_falling_piece(fallingPiece, gameBoard, display, pieceBag):
                 # Please change this later. This is not readable. But basically our color is associated with the shapeIdx
                 gameBoard[gridRow, gridCol] = P.shapeIdx
     gameBoard = remove_full_rows(gameBoard)
+
+    if callback:
+        callback()
 
     return (add_new_falling_piece(display, pieceBag), gameBoard)
